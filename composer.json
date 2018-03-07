@@ -1,0 +1,26 @@
+{
+	"name": "this7/routes",
+	"description": "this7 PHP framework router class.",
+	"license": "MIT",
+	"homepage": "https://github.com/this7/routes",
+	"keywords": [
+		"router",
+		"php-router",
+		"php"
+	],
+	"authors": [
+		{
+			"name": "Yan Tianzeng",
+			"email": "qinuoyun@qq.com",
+			"homepage": "http://www.ub-u7.com/"
+		}
+	],
+	"require": {
+		"php": ">=5.3.3",
+		"this7/config": "dev-master",
+		"this7/view": "dev-master",
+	},
+	"autoload": {
+		"psr-4": { "this7\\routes\\": "src" }
+	}
+}
