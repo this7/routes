@@ -17,8 +17,8 @@
 	],
 	"require": {
 		"php": ">=5.3.3",
-		"this7/config": "dev-master",
-		"this7/view": "dev-master"
+		"this7/config": "~1.0",
+		"this7/view": "~1.0"
 	},
 	"autoload": {
 		"psr-4": { "this7\\routes\\": "src" }
