@@ -159,7 +159,6 @@ class routes {
     public function setApiClass($class = '', $action = '', $file = '') {
         $file = ROOT_DIR . "/api/" . $class . ".php";
         $new  = ROOT_DIR . "/server/controllers/" . $class . md5($class) . ".php";
-
         #如果文件不存在 提示创建
         if (!is_file($file)) {
             $name = md5($class);
@@ -168,14 +167,14 @@ class routes {
 <?php
 class $class {
     public function index() {
-        echo "API";
+        echo "欢迎访问API";
     }
 }
 PHP;
                 to_mkdir($file, $php, true, true);
-                client::go("api/" . $class . '/' . $action);
+                routes::go("api/" . $class . '/' . $action);
             }
-            $url = client::getUrl($_GET['app'] . "/" . $_GET['model'] . "/" . $_GET['action'], "key/" . $name);
+            $url = routes::getUrl($_GET['app'] . "/" . $_GET['model'] . "/" . $_GET['action'], "key/" . $name);
             echo "您访问的Api控制器类不存在，<a href='" . $url . "'>点击此处立即创建</a>";
             exit();
 
@@ -196,5 +195,97 @@ use \Exception;';
             $content = preg_replace("/callFunc\s*\(\s*function\s*\(([\w\$]*)\)\s*\{/is", 'callFunc(function (\1){extract(\1);', $content);
             to_mkdir($new, $content, true, true);
         }
+    }
+
+    /**
+     * 页面直接跳转
+     * @param  string  $url  跳转地址
+     * @param  integer $time 停留时间
+     * @param  string  $msg  提示信息
+     * @return [type]        [description]
+     */
+    public function go($url, $time = 0, $msg = '') {
+        if (is_array($url)) {
+            switch (count($url)) {
+            case 2:
+                $url = $this->getUrl($url[0], $url[1]);
+                break;
+            default:
+                $url = $this->getUrl($url[0]);
+                break;
+            }
+        } else {
+            $url = $this->getUrl($url);
+        }
+        if (!headers_sent()) {
+            $time == 0 ? header("Location:" . $url) : header("refresh:{$time};url={$url}");
+            exit($msg);
+        } else {
+            echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
+            if ($msg) {
+                echo ($msg);
+            }
+            exit;
+        }
+    }
+
+    /**
+     * URL地址获取
+     * @param  sting $address   需要解析的地址用/分割
+     * @param  sting $parameter 需要解析的参数
+     * @return url              返回路径
+     */
+    public function getUrl($address = NULL, $parameter = NULL) {
+        if (strstr($address, "http://") || strstr($address, "https://") || strstr($address, "//")) {
+            return $address;
+        }
+        $array = explode("/", $address);
+        $count = count($array);
+        $par   = array();
+        $url   = null;
+        switch ($count) {
+        case '3':
+            $root     = rtrim(ROOT, "/") . '/' . $array[0];
+            $par['c'] = $array[1];
+            $par['a'] = $array[2];
+            break;
+        case '2':
+            $root     = rtrim(ROOT, "/");
+            $par['c'] = $array[0];
+            $par['a'] = $array[1];
+            break;
+        default:
+        case '1':
+            $root     = rtrim(ROOT, "/");
+            $par['c'] = $_GET['model'];
+            $par['a'] = $array[0];
+            break;
+        }
+        #转换参数信息
+        if (!empty($parameter)) {
+            if (strstr($parameter, "=")) {
+                $array = explode(';', $parameter);
+                foreach ($array as $key => $value) {
+                    $value          = explode('=', $value);
+                    $par[$value[0]] = $value[1];
+                }
+            } elseif (strstr($parameter, "/")) {
+                $array = explode('/', $parameter);
+                for ($i = 0; $i < count($array); $i += 2) {
+                    $par[$array[$i]] = $array[$i + 1];
+                }
+            } elseif (is_array($parameter)) {
+                $par = $parameter;
+            }
+        }
+        #进行参数拼接
+        foreach ($par as $key => $value) {
+            if ($key == 'c' || $key == 'a' || $key == 'w') {
+                $url .= "/{$value}";
+            } else {
+                $url .= "/{$key}/{$value}";
+            }
+        }
+        return $root . $url;
     }
 }
