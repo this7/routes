@@ -172,9 +172,9 @@ class $class {
 }
 PHP;
                 to_mkdir($file, $php, true, true);
-                routes::go("api/" . $class . '/' . $action);
+                redirect("api/" . $class . '/index');
             }
-            $url = routes::getUrl($_GET['app'] . "/" . $_GET['model'] . "/" . $_GET['action'], "key/" . $name);
+            $url = site_url($_GET['app'] . "/" . $_GET['model'] . "/" . $_GET['action'], "key/" . $name);
             echo "您访问的Api控制器类不存在，<a href='" . $url . "'>点击此处立即创建</a>";
             exit();
 
@@ -194,38 +194,6 @@ use \Exception;';
             $content = preg_replace("/R\s*\(\s*function\s*\(([\w\$]*)\)\s*\{/is", 'return R(function (\1){extract(\1);', $content);
             $content = preg_replace("/callFunc\s*\(\s*function\s*\(([\w\$]*)\)\s*\{/is", 'callFunc(function (\1){extract(\1);', $content);
             to_mkdir($new, $content, true, true);
-        }
-    }
-
-    /**
-     * 页面直接跳转
-     * @param  string  $url  跳转地址
-     * @param  integer $time 停留时间
-     * @param  string  $msg  提示信息
-     * @return [type]        [description]
-     */
-    public function go($url, $time = 0, $msg = '') {
-        if (is_array($url)) {
-            switch (count($url)) {
-            case 2:
-                $url = $this->getUrl($url[0], $url[1]);
-                break;
-            default:
-                $url = $this->getUrl($url[0]);
-                break;
-            }
-        } else {
-            $url = $this->getUrl($url);
-        }
-        if (!headers_sent()) {
-            $time == 0 ? header("Location:" . $url) : header("refresh:{$time};url={$url}");
-            exit($msg);
-        } else {
-            echo "<meta http-equiv='Refresh' content='{$time};URL={$url}'>";
-            if ($msg) {
-                echo ($msg);
-            }
-            exit;
         }
     }
 
