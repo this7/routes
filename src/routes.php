@@ -92,7 +92,8 @@ class routes {
         }
 
         $_GET = empty($this->par) ? $this->url : array_merge($this->url, $this->par);
-
+        #执行中间件
+        middleware::run();
         #执行页面或API
         if ($type == 'api') {
             $this->startApi($model, $action);
