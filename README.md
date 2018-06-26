@@ -14,7 +14,6 @@ this7/cache: v3.0.*
 this7/sql: v3.0.*
 this7/util: v3.0.*
 this7/request: v3.0.*
-this7/middleware: v3.0.*
 
 #默认版本
 统一默认版本是v3.0.1

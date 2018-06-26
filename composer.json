@@ -18,7 +18,6 @@
 	"require": {
 		"php": ">=5.3.3",
 		"this7/config": "3.0.*",
-		"this7/middleware": "3.0.*",
 		"this7/view": "3.0.*"
 	},
 	"autoload": {
