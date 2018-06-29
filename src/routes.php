@@ -98,7 +98,7 @@ class routes {
         if ($type == 'api') {
             $this->startApi($model, $action);
         } else {
-            view::exhibition(0);
+            view::display();
         }
     }
 
