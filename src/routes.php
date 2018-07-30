@@ -157,16 +157,21 @@ class routes {
 
     /**
      * 设置API文件
-     * @param string $value [description]
+     * @Author   Sean       Yan
+     * @DateTime 2018-07-30
+     * @param    string     $class  类名
+     * @param    string     $action 方法名
+     * @param    string     $type   调用类型
      */
-    public function setApiClass($class = '', $action = '', $file = '') {
+    public function setApiClass($class = '', $action = '', $type = 1) {
         $file = ROOT_DIR . "/api/" . $class . ".php";
         $new  = ROOT_DIR . "/server/controllers/" . $class . md5($class) . ".php";
         #如果文件不存在 提示创建
         if (!is_file($file)) {
-            $name = md5($class);
-            if (isset($_GET['key']) && $_GET['key'] == $name) {
-                $php = <<<PHP
+            if ($type) {
+                $name = md5($class);
+                if (isset($_GET['key']) && $_GET['key'] == $name) {
+                    $php = <<<PHP
 <?php
 class $class {
     public function index() {
@@ -174,13 +179,16 @@ class $class {
     }
 }
 PHP;
-                to_mkdir($file, $php, true, true);
-                redirect("api/" . $class . '/index');
+                    to_mkdir($file, $php, true, true);
+                    redirect("api/" . $class . '/index');
+                }
+                $url = site_url($_GET['app'] . "/" . $_GET['model'] . "/" . $_GET['action'], "key/" . $name);
+                echo "您访问的Api控制器类不存在，<a href='" . $url . "'>点击此处立即创建</a>";
+                exit();
+            } else {
+                return false;
+                exit();
             }
-            $url = site_url($_GET['app'] . "/" . $_GET['model'] . "/" . $_GET['action'], "key/" . $name);
-            echo "您访问的Api控制器类不存在，<a href='" . $url . "'>点击此处立即创建</a>";
-            exit();
-
         }
         #执行编译
         $status = DEBUG || !file_exists($new) || !is_file($new) || (filemtime($file) > filemtime($new));
