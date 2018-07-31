@@ -62,8 +62,8 @@ class routes {
                 array_shift($url);
             }
             #API访问
-            elseif (strtolower($url[0]) === 'api') {
-                $type = 'api';
+            elseif (strtolower($url[0]) === 'api' || strtolower($url[0]) === 'dapi') {
+                $type = strtolower($url[0]);
                 $app  = $url[0];
                 array_shift($url);
                 $model = !empty($url[0]) ? $url[0] : 'demo';
