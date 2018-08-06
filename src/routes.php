@@ -62,7 +62,7 @@ class routes {
                 array_shift($url);
             }
             #API访问
-            elseif (strtolower($url[0]) === 'api' || strtolower($url[0]) === 'dapi') {
+            elseif (strtolower($url[0]) === 'api' || strtolower($url[0]) === 'dapi' || strtolower($url[0]) === 'system') {
                 $type = strtolower($url[0]);
                 $app  = $url[0];
                 array_shift($url);
@@ -99,9 +99,34 @@ class routes {
         #执行页面或API
         if ($type == 'api' || $type == 'dapi') {
             $this->startApi($model, $action);
+        } elseif ($type == 'system') {
+            $this->actionSystem($model, $action);
         } else {
             view::display();
         }
+    }
+
+    /**
+     * 执行系统函数
+     * @Author   Sean       Yan
+     * @DateTime 2018-08-03
+     * @param    string     $class  [description]
+     * @param    string     $action [description]
+     * @return   [type]             [description]
+     */
+    public function actionSystem($class = '', $action = '') {
+        switch ($class . '-' . $action) {
+        case 'view-saveES5':
+            view::saveES5();
+            break;
+        case 'view-showES5':
+            view::showES5();
+            break;
+        default:
+            # code...
+            break;
+        }
+
     }
 
     /**
