@@ -96,6 +96,7 @@ class routes {
         debug::bootstrap();
         if ($type == 'system') {
             $this->actionSystem($model, $action);
+            exit("系统设置");
         }
         #执行中间件
         middleware::run();
@@ -122,6 +123,9 @@ class routes {
             break;
         case 'view-showES5':
             view::showES5();
+            break;
+        case 'view-getES5':
+            view::getES5();
             break;
         default:
             # code...
@@ -192,6 +196,9 @@ class routes {
     public function setApiClass($class = '', $action = '', $type = 1) {
         $file = ROOT_DIR . "/api/" . $class . ".php";
         $new  = ROOT_DIR . "/server/controllers/" . $class . md5($class) . ".php";
+        if (!file_exists($file) && file_exists($new)) {
+            return;
+        }
         #如果文件不存在 提示创建
         if (!is_file($file)) {
             if ($type) {
