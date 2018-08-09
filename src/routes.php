@@ -43,6 +43,8 @@ class routes {
      */
     public function start($url = '', $par = '') {
         $url = $this->getRoutePath();
+        #检查微信URL
+        $url = $this->wechatURl($url);
         #判断是否为空 则设置默认值
         if (empty($url[0])) {
             $type   = 'page';
@@ -90,7 +92,6 @@ class routes {
             $value               = isset($url[$i + 1]) ? $url[$i + 1] : '';
             $this->par[$url[$i]] = $value;
         }
-
         $_GET = empty($this->par) ? $this->url : array_merge($this->url, $this->par);
         #执行DEBUG
         debug::bootstrap();
@@ -106,6 +107,29 @@ class routes {
         } else {
             view::display();
         }
+    }
+
+    /**
+     * 微信路由地址
+     * @Author   Sean       Yan
+     * @DateTime 2018-08-09
+     * @param    string     $url [description]
+     * @return   [type]            [description]
+     */
+    public function wechatURl($url = '') {
+        $weixin = array('system', 'wechat', 'userAuthorization');
+        $string = implode("", $url);
+        $wechat = md5('wechat') . "_wechat";
+        if ($i = strstr($string, $wechat) === false) {
+            return $url;
+        }
+        $pieces = explode("?", $string);
+        parse_str($pieces[1], $array);
+        foreach ($array as $key => $value) {
+            $weixin[] = $key;
+            $weixin[] = $value;
+        }
+        return $weixin;
     }
 
     /**
@@ -126,6 +150,9 @@ class routes {
             break;
         case 'view-getES5':
             view::getES5();
+            break;
+        case 'wechat-userAuthorization':
+            wechat::userAuthorization();
             break;
         default:
             # code...
