@@ -265,6 +265,9 @@ use \Exception;';
             $content = preg_replace("/R\s*\(\s*function\s*\(([\w\$]*)\)\s*\{/is", 'return R(function (\1){extract(\1);', $content);
             $content = preg_replace("/callFunc\s*\(\s*function\s*\(([\w\$]*)\)\s*\{/is", 'callFunc(function (\1){extract(\1);', $content);
             to_mkdir($new, $content, true, true);
+            #压缩PHP代码
+            $content = php_strip_whitespace($new);
+            to_mkdir($new, $content, true, true);
         }
     }
 
