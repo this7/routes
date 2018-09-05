@@ -151,6 +151,9 @@ class routes {
         case 'view-getES5':
             view::getES5();
             break;
+        case 'view-onekey':
+            view::onekey();
+            break;
         case 'wechat-userAuthorization':
             wechat::userAuthorization();
             break;
@@ -201,14 +204,21 @@ class routes {
             if ($reflection->isPublic()) {
                 #执行动作
                 if ($result = call_user_func_array([$Plugin, $action], [])) {
+                    #执行DEBUG显示
+                    debug::display(["model" => "api"]);
                     die();
+                } else {
+                    #执行DEBUG显示
+                    debug::display(["model" => "api"]);
                 }
+
             } else {
                 echo $class . "API控制器中" . $action . '方法不存在';
             }
         } catch (ReflectionException $e) {
             $action = new ReflectionMethod($Plugin, '__call');
             $action->invokeArgs($Plugin, [$action, '']);
+
         }
     }
 
@@ -223,7 +233,7 @@ class routes {
     public function setApiClass($class = '', $action = '', $type = 1) {
         $file = ROOT_DIR . "/api/" . $class . ".php";
         $new  = ROOT_DIR . "/server/controllers/" . $class . md5($class) . ".php";
-        if (!file_exists($file) && file_exists($new)) {
+        if (!is_file($file) && is_file($new)) {
             return;
         }
         #如果文件不存在 提示创建
