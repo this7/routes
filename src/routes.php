@@ -10,7 +10,8 @@
  * @link      http://www.ub-7.com
  */
 namespace this7\routes;
-use ReflectionMethod;
+use \Exception;
+use \ReflectionMethod;
 
 /**
  * 缓存
@@ -97,7 +98,7 @@ class routes {
         debug::bootstrap();
         if ($type == 'system') {
             $this->actionSystem($model, $action);
-            exit("系统设置");
+            exit("系统内置API");
         }
         #执行中间件
         middleware::run();
@@ -117,19 +118,54 @@ class routes {
      * @return   [type]            [description]
      */
     public function wechatURl($url = '') {
-        $weixin = array('system', 'wechat', 'userAuthorization');
-        $string = implode("", $url);
-        $wechat = md5('wechat') . "_wechat";
-        if ($i = strstr($string, $wechat) === false) {
+        $weixin = array('system', 'wechat');
+        $string = trim($_SERVER['REQUEST_URI'], "/");
+        #判断是否是微信链接-内部跳转链接
+        if (strstr($string, md5('wechat') . "_wechat")) {
+            $weixin[] = 'userAuthorization';
+            #获取自定义数据 4910_wechat/type/get/callback/-1?code=
+            #为了获取URL地址中间4910_wechat到？之间的数据为自定义参数
+            $str    = strlen($wechat);
+            $len    = strrpos($string, '?');
+            $num    = $len - $str;
+            $new    = trim(substr($string, $str, $num), '/');
+            $weixin = array_merge($weixin, explode("/", $new));
+            #格式化数据
+            $pieces = explode("?", $string);
+            parse_str($pieces[1], $array);
+            foreach ($array as $key => $value) {
+                $weixin[] = $key;
+                $weixin[] = $value;
+            }
+            return $weixin;
+        }
+        #第三方-授权事件接收URL  md5("Wechat callback") . "_wechat"; //事件回调
+        elseif (strstr($string, md5('Wechat Third-party callback') . "_wechat")) {
+            #thirdPartiesMessages
+            $weixin[] = 'thirdPartiesMessages';
+            $pieces   = explode("?", $string);
+            if (isset($pieces[1]) && !empty($pieces[1])) {
+                parse_str($pieces[1], $array);
+                foreach ($array as $key => $value) {
+                    $weixin[] = $key;
+                    $weixin[] = $value;
+                }
+            }
+
+        }
+        #第三方-授权事件回调地址
+        elseif (strstr($string, md5('Wechat authorization callback') . "_wechat")) {
+            # code...
+            echo '回调授权';
+            exit();
+        }
+        #第三方-消息与事件接收URL
+        elseif (strstr($string, md5('Wechat callback') . "_wechat")) {
+            # code...
+        } else {
             return $url;
         }
-        $pieces = explode("?", $string);
-        parse_str($pieces[1], $array);
-        foreach ($array as $key => $value) {
-            $weixin[] = $key;
-            $weixin[] = $value;
-        }
-        return $weixin;
+
     }
 
     /**
@@ -156,6 +192,15 @@ class routes {
             break;
         case 'wechat-userAuthorization':
             wechat::userAuthorization();
+            break;
+        case 'wechat-thirdPartiesMessages':
+            wechat::thirdPartiesMessages($_GET);
+            break;
+        case 'wechat-login':
+            wechat::login();
+            break;
+        case 'wechat-demo':
+            wechat::demo();
             break;
         default:
             # code...
@@ -211,14 +256,12 @@ class routes {
                     #执行DEBUG显示
                     debug::display(["model" => "api"]);
                 }
-
             } else {
-                echo $class . "API控制器中" . $action . '方法不存在';
+                throw new Exception("访问[$class]API控制器中[$action]方法不是public方法", 10003);
             }
         } catch (ReflectionException $e) {
             $action = new ReflectionMethod($Plugin, '__call');
             $action->invokeArgs($Plugin, [$action, '']);
-
         }
     }
 
