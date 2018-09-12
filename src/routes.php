@@ -125,6 +125,7 @@ class routes {
             $weixin[] = 'userAuthorization';
             #获取自定义数据 4910_wechat/type/get/callback/-1?code=
             #为了获取URL地址中间4910_wechat到？之间的数据为自定义参数
+            $wechat = md5('wechat') . "_wechat";
             $str    = strlen($wechat);
             $len    = strrpos($string, '?');
             $num    = $len - $str;
@@ -139,7 +140,7 @@ class routes {
             }
             return $weixin;
         }
-        #第三方-授权事件接收URL  md5("Wechat callback") . "_wechat"; //事件回调
+        #第三方-授权事件接收URL  md5("Wechat Third-party) . "_wechat"; //事件回调
         elseif (strstr($string, md5('Wechat Third-party callback') . "_wechat")) {
             #thirdPartiesMessages
             $weixin[] = 'thirdPartiesMessages';
@@ -151,17 +152,49 @@ class routes {
                     $weixin[] = $value;
                 }
             }
-
+            return $weixin;
         }
         #第三方-授权事件回调地址
         elseif (strstr($string, md5('Wechat authorization callback') . "_wechat")) {
-            # code...
-            echo '回调授权';
-            exit();
+            $weixin[] = 'thirdAuthorizeCallback';
+            $wechat   = md5('Wechat Third-party callback') . "_wechat";
+            #获取中间跳转地址
+            $str    = strlen($wechat);
+            $len    = strrpos($string, '?');
+            $num    = $len - $str;
+            $new    = trim(substr($string, $str, $num), '/');
+            $weixin = array_merge($weixin, explode("/", $new));
+            #格式化数据
+            $pieces = explode("?", $string);
+            if (isset($pieces[1]) && !empty($pieces[1])) {
+                parse_str($pieces[1], $array);
+                foreach ($array as $key => $value) {
+                    $weixin[] = $key;
+                    $weixin[] = $value;
+                }
+            }
+            return $weixin;
         }
         #第三方-消息与事件接收URL
         elseif (strstr($string, md5('Wechat callback') . "_wechat")) {
-            # code...
+            $weixin[] = 'thirdCallback';
+            $wechat   = md5('Wechat callback') . "_wechat";
+            #获取中间跳转地址
+            $str    = strlen($wechat);
+            $len    = strrpos($string, '?');
+            $num    = $len - $str;
+            $new    = trim(substr($string, $str, $num), '/');
+            $weixin = array_merge($weixin, explode("/", $new));
+            #格式化数据
+            $pieces = explode("?", $string);
+            if (isset($pieces[1]) && !empty($pieces[1])) {
+                parse_str($pieces[1], $array);
+                foreach ($array as $key => $value) {
+                    $weixin[] = $key;
+                    $weixin[] = $value;
+                }
+            }
+            return $weixin;
         } else {
             return $url;
         }
@@ -196,11 +229,16 @@ class routes {
         case 'wechat-thirdPartiesMessages':
             wechat::thirdPartiesMessages($_GET);
             break;
+        case 'wechat-thirdAuthorizeCallback':
+            wechat::thirdAuthorizeCallback($_GET);
+            break;
         case 'wechat-login':
             wechat::login();
             break;
-        case 'wechat-demo':
-            wechat::demo();
+        case 'wechat-bindcomponent':
+            wechat::bindcomponent();
+        case 'wechat-thirdCallback':
+            wechat::thirdCallback($_GET);
             break;
         default:
             # code...
