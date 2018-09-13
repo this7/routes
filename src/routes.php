@@ -262,7 +262,7 @@ class routes {
         if (isset($_SERVER['PATH_INFO']) && empty($url)) {
             $url = $_SERVER['PATH_INFO'];
         }
-        return explode('/', trim($url, ' / '));
+        return explode('/', trim($url, '/'));
     }
 
     /**
@@ -289,7 +289,6 @@ class routes {
                 if ($result = call_user_func_array([$Plugin, $action], [])) {
                     #执行DEBUG显示
                     debug::display(["model" => "api"]);
-                    die();
                 } else {
                     #执行DEBUG显示
                     debug::display(["model" => "api"]);
