@@ -41,20 +41,12 @@ class api {
                 if ($result = call_user_func_array([$Plugin, $action], [])) {
                     switch ($type) {
                     case 'api':
-                        ob_get_clean();
-                        $data = array(
-                            "code" => 0,
-                            "msg"  => "successful",
-                            "data" => $result,
-                        );
-                        header("content-type:application/json");
-                        echo json_encode($result, JSON_UNESCAPED_UNICODE);
+                        throw new Exception(json_encode($result, JSON_UNESCAPED_UNICODE), ErrorCode::$OK);
                         break;
                     case 'dapi':
                         \this7\debug\debug::display($result);
                         break;
                     }
-                    exit();
                 } else {
                     throw new Exception("无法访问", ErrorCode::$ClassDoesNotExist);
                 }
