@@ -44,11 +44,11 @@ class api {
                         throw new Exception(json_encode($result, JSON_UNESCAPED_UNICODE), ErrorCode::$OK);
                         break;
                     case 'dapi':
-                        \this7\debug\debug::display($result);
+                        \this7\debug\debug::assign($result);
                         break;
                     }
                 } else {
-                    throw new Exception("无法访问", ErrorCode::$ClassDoesNotExist);
+                    throw new Exception("无返回值非API接口禁止访问", ErrorCode::$ClassDoesNotExist);
                 }
             } else {
                 throw new Exception("访问[$class]API控制器中[$action]方法不是public方法", ErrorCode::$ClassDoesNotExist);
