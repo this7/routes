@@ -39,14 +39,7 @@ class api {
             if ($reflection->isPublic()) {
                 #执行动作
                 if ($result = call_user_func_array([$Plugin, $action], [])) {
-                    switch ($type) {
-                    case 'api':
-                        throw new Exception(json_encode($result, JSON_UNESCAPED_UNICODE), ErrorCode::$OK);
-                        break;
-                    case 'dapi':
-                        \this7\debug\debug::assign($result);
-                        break;
-                    }
+                    \this7\debug\debug::assign($result);
                 } else {
                     throw new Exception("无返回值非API接口禁止访问", ErrorCode::$ClassDoesNotExist);
                 }
