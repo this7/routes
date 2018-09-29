@@ -39,9 +39,13 @@ class base {
      */
     public function start($url = '', $par = '') {
         $url = $this->getRoutePath();
+        #检查图片URL
+        if (class_exists('images')) {
+            $url = images::imagesURL($url);
+        }
         #检查微信URL
         if (class_exists('wechat')) {
-            $url = wechat::wechatURl($url);
+            $url = wechat::wechatURL($url);
         }
         #判断是否为空 则设置默认值
         if (empty($url[0])) {
