@@ -39,6 +39,10 @@ class base {
      */
     public function start($url = '', $par = '') {
         $url = $this->getRoutePath();
+        #检查视图URL
+        if (class_exists('view')) {
+            $url = view::viewURL($url);
+        }
         #检查图片URL
         if (class_exists('images')) {
             $url = images::imagesURL($url);
